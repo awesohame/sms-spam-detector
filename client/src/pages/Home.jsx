@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { twMerge } from 'tailwind-merge';
 function App() {
     const [inputText, setInputText] = useState('');
     const [prediction, setPrediction] = useState(null);
@@ -18,6 +18,8 @@ function App() {
             console.error('Error:', error);
         }
     };
+
+    const conditionalClasses = prediction === 'Spam' ? 'bg-red-500' : 'bg-green-500';
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-700 text-white p-8">
@@ -38,7 +40,7 @@ function App() {
                 </button>
             </div>
             {prediction && (
-                <div className={`mt-8 w-full max-w-xl p-4 rounded text-black h-16 flex items-center justify-center ${prediction === 'Spam' ? 'bg-red-500' : 'bg-green-500'} transition duration-500 ease-in-out`}>
+                <div className={twMerge(`mt-8 w-full max-w-xl p-4 rounded text-black h-16 flex items-center justify-center transition duration-500 ease-in-out`, conditionalClasses)}>
                     <h2 className="text-3xl">{prediction}</h2>
                 </div>
             )}
