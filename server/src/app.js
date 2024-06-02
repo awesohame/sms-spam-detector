@@ -13,9 +13,9 @@ app.use(express.static("public"))
 app.use(cookieParser());
 
 //routes import
-
+import predictRoute from './routes/predictspam.route.js';
 
 //routes declaration
-
+app.use('/api/v1/predict', predictRoute);
 
 export { app, port }

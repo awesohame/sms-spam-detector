@@ -1,24 +1,17 @@
-import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pickle
 import nltk
 import string
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-nltk.download('stopwords')
-nltk.download('punkt')
-
-
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Load model and vectorizer
-dir_path = os.path.dirname(os.path.realpath(__file__))
-vectorizer_path = os.path.join(dir_path, 'vectorizer.pkl')
-model_path = os.path.join(dir_path, 'model.pkl')
-
-tfidf = pickle.load(open(vectorizer_path, 'rb'))
-model = pickle.load(open(model_path, 'rb'))
+tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
+model = pickle.load(open('model.pkl', 'rb'))
 ps = PorterStemmer()
 
 # Text preprocessing function
@@ -46,16 +39,18 @@ def transform_text(text):
 
     return " ".join(y)
 
-# PREDICTION ENDPOINT
-@app.route('/predict', methods=['GET'])
+# Prediction endpoint
+@app.route('/predict', methods=['POST'])
 def predict():
-    text = request.args.get('text', '')
+    data = request.get_json(force=True)
+    text = data['text']
 
     transformed_sms = transform_text(text)
     vector_input = tfidf.transform([transformed_sms])
-    result = model.predict(vector_input)[0]
+    result = int(model.predict(vector_input)[0])  # Convert result to integer
 
     return jsonify({'result': result})
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
